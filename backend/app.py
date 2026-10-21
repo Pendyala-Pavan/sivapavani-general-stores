@@ -6,6 +6,7 @@ import jwt
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+from werkzeug.security import generate_password_hash, check_password_hash
 
 load_dotenv()
 
@@ -70,16 +71,55 @@ def admin_login():
     email = data.get('email')
     password = data.get('password')
 
-    # Simple authentication (in production, use proper hashing)
-    if email == 'admin@sivapavani.com' and password == 'admin123':
+    try:
+        admin = admin_collection.find_one({'email': email})
+
+        if not admin:
+            return jsonify({'error': 'Invalid credentials'}), 401
+
+        # Check password
+        if not check_password_hash(admin['password_hash'], password):
+            return jsonify({'error': 'Invalid credentials'}), 401
+
+        # Generate JWT token
         token = jwt.encode(
-            {'admin_id': 'admin_1', 'exp': datetime.utcnow() + timedelta(days=7)},
+            {'admin_id': str(admin['_id']), 'email': email, 'exp': datetime.utcnow() + timedelta(days=30)},
             SECRET_KEY,
             algorithm='HS256'
         )
-        return jsonify({'token': token, 'message': 'Login successful'})
 
-    return jsonify({'error': 'Invalid credentials'}), 401
+        return jsonify({'token': token, 'message': 'Login successful', 'admin': {'email': email}})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Setup admin account (run once)
+@app.route('/api/admin/setup', methods=['POST'])
+def setup_admin():
+    """Create production admin account"""
+    try:
+        data = request.json
+        email = data.get('email', 'pendelasiva@gmail.com')
+        password = data.get('password', 'Siva@8055')
+
+        # Check if admin already exists
+        existing = admin_collection.find_one({'email': email})
+        if existing:
+            return jsonify({'error': 'Admin already exists'}), 400
+
+        # Create admin with hashed password
+        admin_doc = {
+            'email': email,
+            'password_hash': generate_password_hash(password),
+            'created_at': datetime.utcnow(),
+            'role': 'admin'
+        }
+
+        result = admin_collection.insert_one(admin_doc)
+        return jsonify({'message': 'Admin account created', 'admin_id': str(result.inserted_id)}), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Products Routes
 @app.route('/api/products', methods=['GET'])

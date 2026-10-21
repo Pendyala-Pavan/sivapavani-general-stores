@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail } from 'lucide-react';
+import API_ENDPOINTS from '../config/api.config';
 import './AdminLogin.css';
 
 function AdminLogin({ onLoginSuccess }) {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@sivapavani.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('pendelasiva@gmail.com');
+  const [password, setPassword] = useState('Siva@8055');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -16,7 +17,7 @@ function AdminLogin({ onLoginSuccess }) {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/admin/login', {
+      const response = await fetch(API_ENDPOINTS.ADMIN_LOGIN, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -92,9 +93,9 @@ function AdminLogin({ onLoginSuccess }) {
           </button>
 
           <div className="demo-info">
-            <p className="demo-title">Demo Credentials:</p>
-            <p>Email: admin@sivapavani.com</p>
-            <p>Password: admin123</p>
+            <p className="demo-title">Production Admin Credentials:</p>
+            <p>Email: pendelasiva@gmail.com</p>
+            <p>Password: Siva@8055</p>
           </div>
         </form>
       </div>
