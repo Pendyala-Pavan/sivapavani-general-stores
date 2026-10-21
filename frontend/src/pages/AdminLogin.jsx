@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Mail } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import API_ENDPOINTS from '../config/api.config';
 import './AdminLogin.css';
 
 function AdminLogin({ onLoginSuccess }) {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('pendelasiva@gmail.com');
-  const [password, setPassword] = useState('Siva@8055');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -34,11 +35,7 @@ function AdminLogin({ onLoginSuccess }) {
       onLoginSuccess(token);
       navigate('/admin/dashboard');
     } catch (err) {
-      setError(err.message || 'Login failed. Check backend server.');
-      const demoToken = 'demo_token_' + Date.now();
-      localStorage.setItem('adminToken', demoToken);
-      onLoginSuccess(demoToken);
-      navigate('/admin/dashboard');
+      setError(err.message || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -78,25 +75,27 @@ function AdminLogin({ onLoginSuccess }) {
               <Lock size={18} />
               <input
                 id="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
                 disabled={loading}
               />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+                disabled={loading}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
           <button type="submit" className="btn-login" disabled={loading}>
             {loading ? 'Logging in...' : 'Sign In'}
           </button>
-
-          <div className="demo-info">
-            <p className="demo-title">Production Admin Credentials:</p>
-            <p>Email: pendelasiva@gmail.com</p>
-            <p>Password: Siva@8055</p>
-          </div>
         </form>
       </div>
     </div>

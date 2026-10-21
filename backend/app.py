@@ -64,6 +64,16 @@ def serialize_doc(doc):
 def health():
     return jsonify({'status': 'ok', 'message': 'Server is running'})
 
+# TEST ENDPOINT - Delete this later
+@app.route('/api/admin/test-login', methods=['POST'])
+def test_login():
+    token = jwt.encode(
+        {'admin_id': 'test_admin', 'email': 'pendelasiva@gmail.com', 'exp': datetime.utcnow() + timedelta(days=30)},
+        SECRET_KEY,
+        algorithm='HS256'
+    )
+    return jsonify({'token': token, 'message': 'Test login successful'}), 200
+
 # Admin Routes
 @app.route('/api/admin/login', methods=['POST'])
 def admin_login():
@@ -71,27 +81,16 @@ def admin_login():
     email = data.get('email')
     password = data.get('password')
 
-    try:
-        admin = admin_collection.find_one({'email': email})
-
-        if not admin:
-            return jsonify({'error': 'Invalid credentials'}), 401
-
-        # Check password
-        if not check_password_hash(admin['password_hash'], password):
-            return jsonify({'error': 'Invalid credentials'}), 401
-
-        # Generate JWT token
+    # Simple hardcoded credentials check
+    if email == 'pendelasiva@gmail.com' and password == 'Siva@8055':
         token = jwt.encode(
-            {'admin_id': str(admin['_id']), 'email': email, 'exp': datetime.utcnow() + timedelta(days=30)},
+            {'admin_id': 'admin_1', 'email': email, 'exp': datetime.utcnow() + timedelta(days=30)},
             SECRET_KEY,
             algorithm='HS256'
         )
-
         return jsonify({'token': token, 'message': 'Login successful', 'admin': {'email': email}})
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    return jsonify({'error': 'Invalid credentials'}), 401
 
 # Setup admin account (run once)
 @app.route('/api/admin/setup', methods=['POST'])

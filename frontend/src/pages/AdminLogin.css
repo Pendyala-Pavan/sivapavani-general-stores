@@ -170,6 +170,29 @@
   cursor: not-allowed;
 }
 
+.toggle-password {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.toggle-password:hover:not(:disabled) {
+  color: #1e40af;
+  transform: scale(1.1);
+}
+
+.toggle-password:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-login {
   background: linear-gradient(135deg, #1e40af 0%, #8b5cf6 100%);
   color: white;
