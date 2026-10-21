@@ -3,7 +3,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ||
   (typeof window !== 'undefined' && window.location.hostname === 'localhost'
     ? 'http://localhost:5000'
-    : 'https://api.sivapavani-general-stores.com');
+    : 'https://sivapavani-general-stores-1.onrender.com');
 
 export const API_ENDPOINTS = {
   // Admin
